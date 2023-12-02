@@ -1,0 +1,9 @@
+[workspace]
+resolver = "2"
+members = [
+    "day-*"
+]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[workspace.dependencies]
