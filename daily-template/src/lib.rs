@@ -10,8 +10,37 @@ pub fn read_lines() -> Vec<String> {
 }
 
 
+pub fn part_one(inp: Vec<String>) -> String {
+    ""
+}
+
+pub fn part_two(inp: Vec<String>) -> String {
+    ""
+}
+
 #[cfg(test)]
 mod test {
     use crate::*;
 
+    #[test]
+    pub fn test_part_one() {
+        let input = Vec::from([
+            "".to_string(),
+        ]);
+
+        let res = part_one(input);
+
+        assert_eq!(res, "");
+    }
+
+    #[test]
+    pub fn test_part_two() {
+        let input = Vec::from([
+            "".to_string(),
+        ]);
+
+        let res = part_two(input);
+
+        assert_eq!(res, "");
+    }
 }

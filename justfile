@@ -6,3 +6,6 @@ test day:
 
 create day:
     cargo generate --path ./daily-template --name {{day}}
+
+lint:
+    cargo watch -x "clippy --all-targets --all-features"
