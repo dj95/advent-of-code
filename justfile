@@ -1,4 +1,4 @@
-work day part:
+run day part:
     cargo run -p {{day}} --bin {{part}}
 
 test day:
