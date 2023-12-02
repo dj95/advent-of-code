@@ -30,6 +30,26 @@ impl Game {
         })
     }
 
+    pub fn minimal_set(&self) -> Set {
+        let mut output = Set::from_string("".to_string());
+
+        for set in &self.sets {
+            if set.blue > output.blue {
+                output.blue = set.blue;
+            }
+
+            if set.green > output.green {
+                output.green = set.green;
+            }
+
+            if set.red > output.red {
+                output.red = set.red;
+            }
+        }
+
+        output
+    }
+
     pub fn is_valid(&self, total: Set) -> bool {
         for set in self.sets.iter() {
             if set.is_valid(total.clone()) {
@@ -57,6 +77,10 @@ impl Set {
             green: extract_color_count(inp.clone(), "green".to_string()),
             red: extract_color_count(inp, "red".to_string()),
         }
+    }
+
+    pub fn power(&self) -> u32 {
+        self.blue * self.green * self.red
     }
 
     pub fn is_valid(&self, total: Set) -> bool {
@@ -119,9 +143,63 @@ pub fn part_one(inp: Vec<String>, total: Set) -> u32 {
     output
 }
 
+pub fn part_two(inp: Vec<String>) -> u32 {
+    let mut output = 0;
+
+    for line in inp {
+        let game = Game::from_string(line.to_string());
+
+        if game.is_err() {
+            continue;
+        }
+
+        output += game.unwrap().minimal_set().power();
+    }
+
+    output
+}
+
 #[cfg(test)]
 mod test {
     use crate::*;
+
+    #[test]
+    pub fn test_part_two() {
+        let input = Vec::from([
+            "Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green".to_string(),
+            "Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue".to_string(),
+            "Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red".to_string(),
+            "Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red".to_string(),
+            "Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green".to_string(),
+        ]);
+
+        let res = part_two(input);
+
+        assert_eq!(res, 2286);
+    }
+
+    #[test]
+    pub fn test_minimal_set() {
+        let game =
+            Game::from_string("Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green".to_string())
+                .unwrap();
+
+        let res = game.minimal_set();
+        assert_eq!(
+            res,
+            Set {
+                blue: 6,
+                green: 2,
+                red: 4,
+            },
+        );
+    }
+
+    #[test]
+    pub fn test_set_power() {
+        let power = Set::from_string("6 blue, 2 green, 4 red".to_string()).power();
+        assert_eq!(power, 48);
+    }
 
     #[test]
     pub fn test_part_one() {
