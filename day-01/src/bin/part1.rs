@@ -13,7 +13,7 @@ fn main() {
 
         let calibration_number = calibration_number.unwrap();
 
-        sum = sum + calibration_number;
+        sum += calibration_number;
     }
 
     println!("part one :: {}", sum);

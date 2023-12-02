@@ -37,7 +37,7 @@ fn replace_written_digits(inp: String, reversed: bool) -> String {
         }
     }
 
-    if pattern_key == "" {
+    if pattern_key.is_empty() {
         return inp;
     }
 
@@ -86,7 +86,7 @@ fn part_two_logic(lines: Vec<String>) -> u32 {
 
         let calibration_number = calibration_number.unwrap();
 
-        sum = sum + calibration_number;
+        sum += calibration_number;
     }
 
     sum

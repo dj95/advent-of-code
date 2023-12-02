@@ -66,8 +66,8 @@ impl Set {
 
 fn sets_from_string(inp: String) -> Vec<Set> {
     let mut output = Vec::new();
-    let parts: Vec<&str> = inp.split(":").collect();
-    let parts: Vec<&str> = parts[1].split(";").collect();
+    let parts: Vec<&str> = inp.split(':').collect();
+    let parts: Vec<&str> = parts[1].split(';').collect();
 
     for part in parts {
         let set = Set::from_string(part.to_string());
@@ -82,10 +82,7 @@ fn extract_color_count(inp: String, color: String) -> u32 {
     let pattern = Regex::new(format!("(\\d+) {}", color).as_str()).unwrap();
 
     match pattern.captures(&inp) {
-        Some(cap) => match (&cap[1]).parse::<u32>() {
-            Ok(num) => num,
-            Err(_) => 0,
-        },
+        Some(cap) => (cap[1]).parse::<u32>().unwrap_or(0),
         None => 0,
     }
 }
@@ -94,7 +91,7 @@ fn extract_game_id(inp: String) -> Option<u32> {
     let pattern = Regex::new("Game (\\d+):").unwrap();
     let captures = pattern.captures(&inp).unwrap();
 
-    match (&captures[1]).parse::<u32>() {
+    match (captures[1]).parse::<u32>() {
         Ok(num) => Some(num),
         Err(_) => None,
     }
@@ -116,7 +113,7 @@ pub fn part_one(inp: Vec<String>, total: Set) -> u32 {
             continue;
         }
 
-        output = output + game.id;
+        output += game.id;
     }
 
     output
