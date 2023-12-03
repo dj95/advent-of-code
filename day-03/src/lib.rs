@@ -58,9 +58,9 @@ impl Engine {
                     continue;
                 }
 
-                output.push(gear_part_nos.iter().fold(1, |mut sum, part_no| {
-                    sum *= part_no.number;
-                    sum
+                output.push(gear_part_nos.iter().fold(1, |mut product, part_no| {
+                    product *= part_no.number;
+                    product
                 }));
             }
         }
