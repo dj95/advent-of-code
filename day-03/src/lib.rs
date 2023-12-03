@@ -21,7 +21,6 @@ fn is_adjacent(range: Range<usize>, part_no: PartNumber) -> bool {
 
 #[derive(Debug, PartialEq)]
 pub struct Engine {
-    pub schematic: Vec<Vec<char>>,
     pub lines: Vec<String>,
 }
 
@@ -35,7 +34,7 @@ impl Engine {
             schematic.push(line_chars);
         }
 
-        Self { schematic, lines }
+        Self { lines }
     }
 
     pub fn find_gear_ratios(&self, part_nos: Vec<PartNumber>) -> Vec<u32> {
@@ -198,10 +197,6 @@ mod test {
         let res = Engine::from_lines(vec!["467..114..".to_string(), "...*......".to_string()]);
 
         let expected = Engine {
-            schematic: vec![
-                vec!['4', '6', '7', '.', '.', '1', '1', '4', '.', '.'],
-                vec!['.', '.', '.', '*', '.', '.', '.', '.', '.', '.'],
-            ],
             lines: vec!["467..114..".to_string(), "...*......".to_string()],
         };
 
