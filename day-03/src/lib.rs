@@ -80,7 +80,8 @@ impl Engine {
                 output.push(
                     gear_part_nos
                         .iter()
-                        .fold(1, |product, part_no| product * part_no.number),
+                        .map(|p_no| p_no.number)
+                        .product::<u32>(),
                 );
             }
         }
