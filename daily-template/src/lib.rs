@@ -11,11 +11,11 @@ pub fn read_lines() -> Vec<String> {
 
 
 pub fn part_one(inp: Vec<String>) -> String {
-    ""
+    "".to_string()
 }
 
 pub fn part_two(inp: Vec<String>) -> String {
-    ""
+    "".to_string()
 }
 
 #[cfg(test)]

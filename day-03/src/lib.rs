@@ -1,4 +1,4 @@
-use std::cmp;
+use std::{cmp, ops::Range};
 
 use regex::Regex;
 
@@ -11,6 +11,12 @@ pub fn read_lines() -> Vec<String> {
     }
 
     res
+}
+
+fn is_adjacent(range: Range<usize>, part_no: PartNumber) -> bool {
+    let min_end = range.end.saturating_sub(2);
+
+    range.start + 1 >= part_no.position.start && min_end <= part_no.position.end
 }
 
 #[derive(Debug, PartialEq)]
@@ -32,6 +38,36 @@ impl Engine {
         Self { schematic, lines }
     }
 
+    pub fn find_gear_ratios(&self, part_nos: Vec<PartNumber>) -> Vec<u32> {
+        let mut output = Vec::new();
+
+        let pattern = Regex::new("(\\*)").unwrap();
+        for (line_no, line) in self.lines.iter().enumerate() {
+            for mat in pattern.find_iter(line) {
+                let gear_part_nos: Vec<PartNumber> = part_nos
+                    .clone()
+                    .into_iter()
+                    .filter(|p_no| {
+                        p_no.position.line >= line_no.saturating_sub(1)
+                            && p_no.position.line <= line_no + 1
+                    })
+                    .filter(|p_no| is_adjacent(mat.range(), *p_no))
+                    .collect();
+
+                if gear_part_nos.len() != 2 {
+                    continue;
+                }
+
+                output.push(gear_part_nos.iter().fold(1, |mut sum, part_no| {
+                    sum *= part_no.number;
+                    sum
+                }));
+            }
+        }
+
+        output
+    }
+
     pub fn part_no_is_adjacent(&self, part_no: PartNumber) -> bool {
         let start_line = part_no.position.line.saturating_sub(1);
         let end_line = cmp::min(self.lines.len() - 1, part_no.position.line + 1);
@@ -41,9 +77,7 @@ impl Engine {
             let line = self.lines.get(line_counter);
 
             for mat in pattern.find_iter(line.unwrap()) {
-                let min_end = mat.end().saturating_sub(2);
-
-                if mat.start() + 1 >= part_no.position.start && min_end <= part_no.position.end {
+                if is_adjacent(mat.range(), part_no) {
                     return true;
                 }
             }
@@ -52,22 +86,23 @@ impl Engine {
     }
 
     pub fn find_part_numbers(&self) -> Vec<PartNumber> {
-        let mut output = Vec::new();
+        let mut output: Vec<PartNumber> = Vec::new();
         let pattern = Regex::new("([0-9]+)").unwrap();
 
         for (line_counter, line) in self.lines.iter().enumerate() {
-            let mats = pattern.find_iter(line);
-
-            for mat in mats {
-                output.push(PartNumber {
+            let mut mats: Vec<PartNumber> = pattern
+                .find_iter(line)
+                .map(|mat| PartNumber {
                     number: mat.as_str().to_string().parse::<u32>().unwrap(),
                     position: Position {
                         line: line_counter,
                         start: mat.start(),
                         end: mat.end() - 1,
                     },
-                });
-            }
+                })
+                .collect();
+
+            output.append(&mut mats);
         }
 
         output
@@ -103,8 +138,15 @@ pub fn part_one(inp: Vec<String>) -> u32 {
     output
 }
 
-pub fn part_two(inp: Vec<String>) -> String {
-    "".to_string()
+pub fn part_two(inp: Vec<String>) -> u32 {
+    let engine = Engine::from_lines(inp);
+    let part_nos = engine.find_part_numbers();
+    let gear_ratios = engine.find_gear_ratios(part_nos);
+
+    gear_ratios.iter().fold(0, |mut sum, ratio| {
+        sum += ratio;
+        sum
+    })
 }
 
 #[cfg(test)]
@@ -167,6 +209,28 @@ mod test {
     }
 
     #[test]
+    pub fn test_find_part_numbers_with_gears() {
+        let engine = Engine::from_lines(vec![
+            "467..114..".to_string(),
+            "...*......".to_string(),
+            "..35..633.".to_string(),
+            "......#...".to_string(),
+            "617*......".to_string(),
+            ".....+.58.".to_string(),
+            "..592.....".to_string(),
+            "......755.".to_string(),
+            "...$.*....".to_string(),
+            ".664.598..".to_string(),
+        ]);
+
+        let part_nos = engine.find_part_numbers();
+
+        let res = engine.find_gear_ratios(part_nos);
+
+        assert_eq!(res, vec![16345, 451490]);
+    }
+
+    #[test]
     pub fn test_part_one() {
         let input = vec![
             "467..114..".to_string(),
@@ -188,10 +252,21 @@ mod test {
 
     #[test]
     pub fn test_part_two() {
-        let input = Vec::from(["".to_string()]);
+        let input = vec![
+            "467..114..".to_string(),
+            "...*......".to_string(),
+            "..35..633.".to_string(),
+            "......#...".to_string(),
+            "617*......".to_string(),
+            ".....+.58.".to_string(),
+            "..592.....".to_string(),
+            "......755.".to_string(),
+            "...$.*....".to_string(),
+            ".664.598..".to_string(),
+        ];
 
         let res = part_two(input);
 
-        assert_eq!(res, "");
+        assert_eq!(res, 467835);
     }
 }
