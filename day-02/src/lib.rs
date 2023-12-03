@@ -51,15 +51,11 @@ impl Game {
     }
 
     pub fn is_valid(&self, total: Set) -> bool {
-        for set in self.sets.iter() {
-            if set.is_valid(total.clone()) {
-                continue;
-            }
-
-            return false;
-        }
-
-        true
+        self.sets
+            .iter()
+            .filter(|s| !s.is_valid(total.clone()))
+            .count()
+            == 0
     }
 }
 
@@ -89,17 +85,12 @@ impl Set {
 }
 
 fn sets_from_string(inp: String) -> Vec<Set> {
-    let mut output = Vec::new();
     let parts: Vec<&str> = inp.split(':').collect();
-    let parts: Vec<&str> = parts[1].split(';').collect();
 
-    for part in parts {
-        let set = Set::from_string(part.to_string());
-
-        output.push(set);
-    }
-
-    output
+    parts[1]
+        .split(';')
+        .map(|p| Set::from_string(p.to_string()))
+        .collect()
 }
 
 fn extract_color_count(inp: String, color: String) -> u32 {
@@ -122,41 +113,25 @@ fn extract_game_id(inp: String) -> Option<u32> {
 }
 
 pub fn part_one(inp: Vec<String>, total: Set) -> u32 {
-    let mut output = 0;
-
-    for line in inp {
-        let game = Game::from_string(line.to_string());
-
-        if game.is_err() {
-            continue;
-        }
-
-        let game = game.unwrap();
-
-        if !game.is_valid(total.clone()) {
-            continue;
-        }
-
-        output += game.id;
-    }
-
-    output
+    inp.iter()
+        .map(|l| Game::from_string(l.to_string()))
+        .filter(|g| !g.is_err())
+        .map(|g| g.unwrap())
+        .filter(|g| g.is_valid(total.clone()))
+        .fold(0, |mut sum, g| {
+            sum += g.id;
+            sum
+        })
 }
 
 pub fn part_two(inp: Vec<String>) -> u32 {
-    let mut output = 0;
-
-    for line in inp {
-        let game = Game::from_string(line.to_string());
-
-        if game.is_err() {
-            continue;
-        }
-
-        output += game.unwrap().minimal_set().power();
-    }
-
-    output
+    inp.iter()
+        .map(|l| Game::from_string(l.to_string()))
+        .filter(|g| !g.is_err())
+        .fold(0, |mut sum, g| {
+            sum += g.unwrap().minimal_set().power();
+            sum
+        })
 }
 
 #[cfg(test)]
