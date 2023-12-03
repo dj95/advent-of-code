@@ -125,16 +125,13 @@ pub fn part_one(inp: Vec<String>) -> u32 {
     let engine = Engine::from_lines(inp);
     let part_nos = engine.find_part_numbers();
 
-    let mut output = 0;
-    for part_no in part_nos {
-        if !engine.part_no_is_adjacent(part_no) {
-            continue;
-        }
-
-        output += part_no.number;
-    }
-
-    output
+    part_nos
+        .iter()
+        .filter(|p_no| engine.part_no_is_adjacent(**p_no))
+        .fold(0, |mut sum, p_no| {
+            sum += p_no.number;
+            sum
+        })
 }
 
 pub fn part_two(inp: Vec<String>) -> u32 {
