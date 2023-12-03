@@ -26,4 +26,8 @@ For running the project with its part or test use the following commands:
 just run day-XX partY
 
 just test day-XX
+
+just lint
+
+just bench day-XX
 ```
