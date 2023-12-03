@@ -8,5 +8,11 @@ edition = "2021"
 [dependencies]
 fancy-regex = "0.12.0"
 onig = { version = "6.4.0", default-features = false }
-pcre2 = "0.2.6"
 regex = "1.10.2"
+
+[dev-dependencies]
+divan = "0.1.4"
+
+[[bench]]
+name = "benches"
+harness = false

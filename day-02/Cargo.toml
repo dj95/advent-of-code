@@ -9,3 +9,10 @@ edition = "2021"
 anyhow = "1.0.75"
 fancy-regex = "0.12.0"
 regex = "1.10.2"
+
+[dev-dependencies]
+divan = "0.1.4"
+
+[[bench]]
+name = "benches"
+harness = false

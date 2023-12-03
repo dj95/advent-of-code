@@ -9,3 +9,6 @@ create day:
 
 lint:
     cargo watch -x "clippy --all-targets --all-features"
+
+bench day:
+    cargo bench -p "{{day}}"
