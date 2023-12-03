@@ -131,7 +131,7 @@ pub fn part_one(inp: Vec<String>) -> u32 {
     engine
         .find_adj_part_nos()
         .iter()
-        .fold(0, |sum, p_no| sum + p_no)
+        .sum::<u32>()
 }
 
 pub fn part_two(inp: Vec<String>) -> u32 {
@@ -140,7 +140,7 @@ pub fn part_two(inp: Vec<String>) -> u32 {
     engine
         .find_gear_ratios()
         .iter()
-        .fold(0, |sum, ratio| sum + ratio)
+        .sum::<u32>()
 }
 
 #[cfg(test)]

@@ -1,5 +1,4 @@
 use day_02::{part_one, read_lines, Set, part_two};
-use divan;
 
 fn main() {
     divan::main();

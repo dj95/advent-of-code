@@ -37,9 +37,9 @@ pub fn get_numbers(inp: String, with_words: bool) -> Option<String> {
         .fold("".to_string(), |res, mat| {
             let r = mat.at(1).unwrap();
 
-            let mut digit = r.clone().to_string();
+            let mut digit = r.to_string();
             if with_words {
-                digit = word_to_digit(r.clone().to_string());
+                digit = word_to_digit(r.to_string());
             }
 
             format!("{}{}", res, digit)
