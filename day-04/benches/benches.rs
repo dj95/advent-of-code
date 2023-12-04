@@ -1,4 +1,4 @@
-use {{crate_name}}::{part_one, part_two, read_lines};
+use day_04::{part_one, part_two, read_lines};
 
 fn main() {
     divan::main();
