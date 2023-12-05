@@ -1,5 +1,5 @@
 run day part:
-    cargo run -p {{day}} --bin {{part}}
+    cargo run -r -p {{day}} --bin {{part}}
 
 test day:
     cargo watch -x "nextest run -p {{day}}"
