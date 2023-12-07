@@ -24,9 +24,9 @@ mod test {
 
     #[test]
     pub fn test_part_one() {
-        let input = Vec::from([
+        let input = vec![
             "".to_string(),
-        ]);
+        ];
 
         let res = part_one(input);
 
@@ -35,9 +35,9 @@ mod test {
 
     #[test]
     pub fn test_part_two() {
-        let input = Vec::from([
+        let input = vec![
             "".to_string(),
-        ]);
+        ];
 
         let res = part_two(input);
 
