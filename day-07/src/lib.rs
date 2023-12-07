@@ -104,10 +104,10 @@ impl Hand {
         }
         trace!(?transform);
 
-        let mut cards = self.cards.clone();
+        let mut cards = self.cards;
         for (i, c) in cards.into_iter().enumerate() {
             if c == Card::Joker {
-                cards[i] = transform.clone();
+                cards[i] = transform;
             }
         }
         trace!(?cards);
@@ -118,7 +118,7 @@ impl Hand {
     pub fn cards_by_cardinality(&self, cheat: bool) -> Vec<usize> {
         let mut m: BTreeMap<Card, usize> = BTreeMap::new();
 
-        let mut cards = self.cards.clone();
+        let mut cards = self.cards;
         if cheat {
             cards = self.cheat();
         }
@@ -132,7 +132,7 @@ impl Hand {
             m.insert(c, count);
         }
 
-        m.values().map(|v| *v).collect::<Vec<usize>>()
+        m.values().copied().collect::<Vec<usize>>()
     }
 }
 
@@ -156,8 +156,8 @@ impl Ord for Hand {
             }
         }
 
-        let mut cards = self.cards.clone();
-        let mut other_cards = other.cards.clone();
+        let mut cards = self.cards;
+        let mut other_cards = other.cards;
         if self.cheat {
             cards = cards.map(|c| {
                 if c == Card::Joker {
@@ -238,7 +238,7 @@ pub fn part_one(inp: Vec<String>) -> u64 {
 
     hands.sort();
     for hand in hands.iter() {
-        let cards = hand.cards.clone();
+        let cards = hand.cards;
         trace!(?cards);
     }
 
@@ -261,7 +261,7 @@ pub fn part_two(inp: Vec<String>) -> u64 {
 
     hands.sort();
     for hand in hands.iter() {
-        let cards = hand.cards.clone();
+        let cards = hand.cards;
         trace!(?cards);
     }
 
