@@ -215,7 +215,8 @@ pub fn parse_digit(input: &str) -> IResult<&str, u64> {
 pub fn hand(input: &str, cheat: bool) -> IResult<&str, Hand> {
     let mut input = input;
     let mut cards = [Card::None; 5];
-    for i in 0..5 {
+    #[allow(clippy::needless_range_loop)]
+    for i in 0..cards.len() {
         let (inp, card) = map(complete::take(1usize), |c: &str| Card::from_string(c))(input)?;
         cards[i] = card;
         input = inp;
