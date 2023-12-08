@@ -3,3 +3,14 @@ resolver = "2"
 members = [
     "day-*"
 ]
+
+[workspace.dependencies]
+fancy-regex = "0.12.0"
+nom = "7.1.3"
+regex = "1.10.2"
+test-log = { version = "0.2.14", default-features = false, features = [
+    "trace",
+] }
+tracing = "0.1.40"
+tracing-subscriber = { version = "0.3.18", features = ["fmt", "env-filter"] }
+divan = "0.1.4"
