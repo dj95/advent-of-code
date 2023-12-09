@@ -1,5 +1,6 @@
 use std::collections::BTreeMap;
 
+use lcmx::lcmx;
 use nom::{
     branch::alt,
     bytes::complete::{tag, take_till, take_until},
@@ -8,6 +9,7 @@ use nom::{
     sequence::{delimited, preceded, terminated},
     IResult,
 };
+use rayon::prelude::*;
 use tracing::trace;
 
 pub fn read_lines() -> Vec<String> {
@@ -116,22 +118,15 @@ pub fn part_two(inp: Vec<String>) -> usize {
     let binding = inp.join("\n");
     let (_, (instructions, network)) = parse_input(&binding).unwrap();
     let instructions = instructions.as_bytes();
-    trace!(?instructions);
-    trace!(?network);
 
     let start_nodes = network
         .keys()
         .copied()
         .filter(|n| n.ends_with('A'))
-        .collect::<Vec<&str>>();
+        .map(|n| find_destination_steps(n, instructions, network.clone(), false) as u64)
+        .collect::<Vec<u64>>();
 
-    trace!(?start_nodes);
-    todo!("walk simultaniously");
-
-    start_nodes
-        .iter()
-        .map(|n| find_destination_steps(n, instructions, network.clone(), false))
-        .sum::<usize>()
+    lcmx(&start_nodes).unwrap() as usize
 }
 
 #[cfg(test)]
