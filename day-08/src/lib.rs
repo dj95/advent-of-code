@@ -9,7 +9,6 @@ use nom::{
     sequence::{delimited, preceded, terminated},
     IResult,
 };
-use rayon::prelude::*;
 use tracing::trace;
 
 pub fn read_lines() -> Vec<String> {
@@ -21,6 +20,12 @@ pub fn read_lines() -> Vec<String> {
     }
 
     res
+}
+
+#[derive(Debug, PartialEq)]
+pub struct Map<'a> {
+    pub instructions: &'a str,
+    pub network: BTreeMap<&'a str, (&'a str, &'a str)>,
 }
 
 #[tracing::instrument]
@@ -44,7 +49,7 @@ pub fn network(input: &str) -> IResult<&str, BTreeMap<&str, (&str, &str)>> {
     Ok(("", res))
 }
 
-pub fn parse_input(input: &str) -> IResult<&str, (&str, BTreeMap<&str, (&str, &str)>)> {
+pub fn parse_input(input: &str) -> IResult<&str, Map> {
     let (input, instructions) =
         terminated(take_till(|c: char| c == '\n'), recognize(line_ending))(input)?;
     trace!(input);
@@ -54,7 +59,13 @@ pub fn parse_input(input: &str) -> IResult<&str, (&str, BTreeMap<&str, (&str, &s
     trace!(input);
     trace!(?network);
 
-    Ok((input, (instructions, network)))
+    Ok((
+        input,
+        Map {
+            instructions,
+            network,
+        },
+    ))
 }
 
 pub fn find_destination_steps(
@@ -103,27 +114,29 @@ pub fn find_destination_steps(
 
 pub fn part_one(inp: Vec<String>) -> usize {
     let binding = inp.join("\n");
-    let (_, (instructions, network)) = parse_input(&binding).unwrap();
-    let instructions = instructions.as_bytes();
-    trace!(?instructions);
-    trace!(?network);
+    let (_, my_map) = parse_input(&binding).unwrap();
 
-    let network_keys = network.keys().copied().collect::<Vec<&str>>();
+    let instructions = my_map.instructions.as_bytes();
+    trace!(?instructions);
+    trace!(?my_map.network);
+
+    let network_keys = my_map.network.keys().copied().collect::<Vec<&str>>();
     let first_node_id = network_keys.first().unwrap();
 
-    find_destination_steps(first_node_id, instructions, network, true)
+    find_destination_steps(first_node_id, instructions, my_map.network, true)
 }
 
 pub fn part_two(inp: Vec<String>) -> usize {
     let binding = inp.join("\n");
-    let (_, (instructions, network)) = parse_input(&binding).unwrap();
-    let instructions = instructions.as_bytes();
+    let (_, my_map) = parse_input(&binding).unwrap();
+    let instructions = my_map.instructions.as_bytes();
 
-    let start_nodes = network
+    let start_nodes = my_map
+        .network
         .keys()
         .copied()
         .filter(|n| n.ends_with('A'))
-        .map(|n| find_destination_steps(n, instructions, network.clone(), false) as u64)
+        .map(|n| find_destination_steps(n, instructions, my_map.network.clone(), false) as u64)
         .collect::<Vec<u64>>();
 
     lcmx(&start_nodes).unwrap() as usize
@@ -150,9 +163,9 @@ ZZZ = (ZZZ, ZZZ)
             ),
             Ok((
                 "",
-                (
-                    "RL",
-                    BTreeMap::from([
+                Map {
+                    instructions: "RL",
+                    network: BTreeMap::from([
                         ("AAA", ("BBB", "CCC")),
                         ("BBB", ("DDD", "EEE")),
                         ("CCC", ("ZZZ", "GGG")),
@@ -161,7 +174,7 @@ ZZZ = (ZZZ, ZZZ)
                         ("GGG", ("GGG", "GGG")),
                         ("ZZZ", ("ZZZ", "ZZZ")),
                     ])
-                )
+                }
             ))
         )
     }
