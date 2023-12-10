@@ -116,6 +116,53 @@ fn is_connected(a: Vec<Directions>, a_pos: Position, b: Vec<Directions>, b_pos: 
     return false;
 }
 
+fn position_is_connected(
+    maze: &[Vec<char>],
+    pos: Position,
+    offset: Offset,
+    prev: Position,
+) -> Option<Position> {
+    let directions = directions_from_symbol(maze[pos.y][pos.x]);
+
+    let pos_x = pos.x as i32 + offset.x;
+    let pos_y = pos.y as i32 + offset.y;
+
+    if pos_y < 0 || pos_y >= maze.len() as i32 {
+        return None;
+    }
+
+    let pos_y = pos_y as usize;
+
+    if pos_x < 0 || pos_x > maze[pos_y].len() as i32 {
+        return None;
+    }
+
+    let pos_x = pos_x as usize;
+
+    if pos_x == prev.x && pos_y == prev.y {
+        return None;
+    }
+
+    trace!(
+        "{} {} {:?}",
+        pos_x,
+        pos_y,
+        directions_from_symbol(maze[pos_y][pos_x])
+    );
+    let candidate_dirs = directions_from_symbol(maze[pos_y][pos_x]);
+
+    if !is_connected(
+        directions.clone(),
+        pos.clone(),
+        candidate_dirs,
+        Position { x: pos_x, y: pos_y },
+    ) {
+        return None;
+    }
+
+    Some(Position { x: pos_x, y: pos_y })
+}
+
 fn adjacent_connected_pipes(maze: &[Vec<char>], pos: Position, prev: Position) -> Option<Position> {
     let around = vec![
         Offset { x: 0, y: 1 },
@@ -124,46 +171,11 @@ fn adjacent_connected_pipes(maze: &[Vec<char>], pos: Position, prev: Position) -
         Offset { x: 1, y: 0 },
     ];
 
-    let directions = directions_from_symbol(maze[pos.y][pos.x]);
-
     for offset in around {
-        let pos_x = pos.x as i32 + offset.x;
-        let pos_y = pos.y as i32 + offset.y;
-
-        if pos_y < 0 || pos_y >= maze.len() as i32 {
-            continue;
+        match position_is_connected(maze, pos.clone(), offset, prev.clone()) {
+            Some(p) => return Some(p),
+            None => continue,
         }
-
-        let pos_y = pos_y as usize;
-
-        if pos_x < 0 || pos_x > maze[pos_y].len() as i32 {
-            continue;
-        }
-
-        let pos_x = pos_x as usize;
-
-        if pos_x == prev.x && pos_y == prev.y {
-            continue;
-        }
-
-        trace!(
-            "{} {} {:?}",
-            pos_x,
-            pos_y,
-            directions_from_symbol(maze[pos_y][pos_x])
-        );
-        let candidate_dirs = directions_from_symbol(maze[pos_y][pos_x]);
-
-        if !is_connected(
-            directions.clone(),
-            pos.clone(),
-            candidate_dirs,
-            Position { x: pos_x, y: pos_y },
-        ) {
-            continue;
-        }
-
-        return Some(Position { x: pos_x, y: pos_y });
     }
 
     None
@@ -256,65 +268,23 @@ fn get_char_for_start_pos(maze: &[Vec<char>], pos: Position) -> char {
         (Offset { x: 1, y: 0 }, Directions::East),
     ];
 
-    let directions = directions_from_symbol(maze[pos.y][pos.x]);
-    trace!(?directions);
-
     let mut con_dirs = vec![];
     for (offset, con_dir) in around {
-        let pos_x = pos.x as i32 + offset.x;
-        let pos_y = pos.y as i32 + offset.y;
-
-        if pos_y < 0 || pos_y >= maze.len() as i32 {
-            continue;
+        match position_is_connected(maze, pos.clone(), offset, Position { x: 0, y: 0 }) {
+            Some(_) => con_dirs.push(con_dir),
+            None => continue,
         }
-
-        let pos_y = pos_y as usize;
-
-        if pos_x < 0 || pos_x > maze[pos_y].len() as i32 {
-            continue;
-        }
-
-        let pos_x = pos_x as usize;
-
-        let candidate_dirs = directions_from_symbol(maze[pos_y][pos_x]);
-
-        if !is_connected(
-            directions.clone(),
-            pos.clone(),
-            candidate_dirs,
-            Position { x: pos_x, y: pos_y },
-        ) {
-            continue;
-        }
-
-        con_dirs.push(con_dir);
     }
 
-    if con_dirs == vec![Directions::North, Directions::South] {
-        return '|';
+    match con_dirs.as_slice() {
+        [Directions::North, Directions::South] => '|',
+        [Directions::East, Directions::West] => '-',
+        [Directions::North, Directions::West] => 'J',
+        [Directions::North, Directions::East] => 'L',
+        [Directions::South, Directions::West] => '7',
+        [Directions::South, Directions::East] => 'F',
+        &[] | &[_] | &[_, ..] => 'S',
     }
-
-    if con_dirs == vec![Directions::East, Directions::West] {
-        return '-';
-    }
-
-    if con_dirs == vec![Directions::North, Directions::West] {
-        return 'J';
-    }
-
-    if con_dirs == vec![Directions::North, Directions::East] {
-        return 'L';
-    }
-
-    if con_dirs == vec![Directions::South, Directions::West] {
-        return '7';
-    }
-
-    if con_dirs == vec![Directions::South, Directions::East] {
-        return 'F';
-    }
-
-    'S'
 }
 
 #[tracing::instrument(skip_all)]
