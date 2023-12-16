@@ -21,7 +21,7 @@ pub fn detect_horizontal_fold(inp: &[String], with_smudge: bool) -> Option<usize
                 return a == b;
             }
 
-            a == b || a.chars().zip(b.chars()).filter(|(c, d)| c != d).count() <= 1
+            a.chars().zip(b.chars()).filter(|(c, d)| c != d).count() <= 1
         })
         .find_map(|(a, b)| {
             let inp_a = inp[0..=a.0].iter().map(|l| l.chars()).rev();
@@ -32,12 +32,12 @@ pub fn detect_horizontal_fold(inp: &[String], with_smudge: bool) -> Option<usize
                 false => 0,
             };
 
-            (inp_a
+            inp_a
                 .flatten()
                 .zip(inp_b.flatten())
                 .filter(|(a, b)| a != b)
                 .count()
-                == c)
+                .eq(&c)
                 .then_some(a.0 + 1)
         })
 }
